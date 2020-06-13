@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using GameStore.Domain.Abstract;
-using GameStore.Domain.Entities;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameStore.WebUI.Controllers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GameStore.Domain.Entities;
+using GameStore.Domain.Abstract;
 using Moq;
 
-namespace GameStore.UnitTests
+namespace GameStore.WebUI.Controllers.Tests
 {
-    [TestClass]
-    public class UnitTest1
+    [TestClass()]
+    public class GameControllerTests
     {
-        [TestMethod]
-        public void Can_Paginate()
+        [TestMethod()]
+        public void ListTest()
         {
             Mock<IGameRepository> mock = new Mock<IGameRepository>();
             mock.Setup(m => m.Games).Returns(new List<Game>
@@ -29,15 +32,13 @@ namespace GameStore.UnitTests
             };
 
             // Действие (act)
-            List<Game> result = (List<Game>)controller.List(2).Model;
+            IEnumerable<Game> result = (IEnumerable<Game>)controller.List(2).Model;
 
             // Утверждение (assert)
-            List<Game> games = result;
-            
+            List<Game> games = result.ToList();
             Assert.IsTrue(games.Count == 2);
             Assert.AreEqual(games[0].Name, "Игра4");
             Assert.AreEqual(games[1].Name, "Игра5");
-
         }
     }
 }
