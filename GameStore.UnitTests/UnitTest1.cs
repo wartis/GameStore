@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Mvc;
 using GameStore.Domain.Abstract;
 using GameStore.Domain.Entities;
 using GameStore.WebUI.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using GameStore.WebUI.HtmlHelpers;
+using GameStore.WebUI.Models;
 
 namespace GameStore.UnitTests
 {
@@ -12,31 +15,25 @@ namespace GameStore.UnitTests
     public class UnitTest1
     {
         [TestMethod]
-        public void Can_Paginate()
+        public void Can_Generate_Page_Links()
         {
-            Mock<IGameRepository> mock = new Mock<IGameRepository>();
-            mock.Setup(m => m.Games).Returns(new List<Game>
+            HtmlHelper helper = null;
+
+            PagingInfo pi = new PagingInfo
             {
-                new Game { GameId = 1, Name = "Игра1"},
-                new Game { GameId = 2, Name = "Игра2"},
-                new Game { GameId = 3, Name = "Игра3"},
-                new Game { GameId = 4, Name = "Игра4"},
-                new Game { GameId = 5, Name = "Игра5"}
-            });
-            GameController controller = new GameController(mock.Object)
-            {
-                pageSize = 3
+                CurrentPage = 2,
+                TotalItems = 28,
+                ItemsPerPage = 10
             };
 
-            // Действие (act)
-            List<Game> result = (List<Game>)controller.List(2).Model;
+            Func<int, string> urlGeneratorDelegate = i => "Page" + i;  
 
-            // Утверждение (assert)
-            List<Game> games = result;
-            
-            Assert.IsTrue(games.Count == 2);
-            Assert.AreEqual(games[0].Name, "Игра4");
-            Assert.AreEqual(games[1].Name, "Игра5");
+            MvcHtmlString result = helper.PageLinks(pi, urlGeneratorDelegate);
+
+            Assert.AreEqual<string>(@"<a class=""btn btn-default"" href=""Page1"">1</a>"
+                + @"<a class=""btn btn-default btn-primary selected"" href=""Page2"">2</a>"
+                + @"<a class=""btn btn-default"" href=""Page3"">3</a>", result.ToString()); 
+
 
         }
     }

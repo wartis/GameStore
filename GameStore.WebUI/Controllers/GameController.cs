@@ -1,4 +1,6 @@
 ﻿using GameStore.Domain.Abstract;
+using GameStore.Domain.Entities;
+using GameStore.WebUI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +21,22 @@ namespace GameStore.WebUI.Controllers
 
         public ViewResult List(int page = 1) 
         {
-            return View(repository.Games
-                .OrderBy(game => game.GameId)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)); 
+            GamesListViewModel model = new GamesListViewModel
+            {
+                Games = repository.Games
+                    .OrderBy(x => x.GameId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize),
+
+                PagingInfo = new PagingInfo
+                {
+                    CurrentPage = page,
+                    ItemsPerPage = pageSize,
+                    TotalItems = repository.Games.Count()
+                }
+            };
+
+            return View(model); 
         }
 
 
